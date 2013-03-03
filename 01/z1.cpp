@@ -51,8 +51,14 @@ double z4iter(double t, double u, double dt, double umi)
     return u + (-10.0*(umi - 5.0*t*t) + 10.0*t)*dt;
 }
 
+double z5iter(double t, double u, double dt, double umi)
+{
+    return umi - ((umi-u-dt*z2f(t, umi))/(1-dt*(-10.0)));
+}
+
 int main()
 {
+    cout.precision(6);
     // ZADANIE 1A
 	double dt = 1.;
     std::ofstream eu_jaw_f("zad1A_jaw.txt");
@@ -61,9 +67,9 @@ int main()
     double eu_jaw = 0;
     double eu_njaw = 0;
     double trap = 0;
-    eu_jaw_f.precision(6);
-    eu_njaw_f.precision(6);
-    trap_f.precision(6);
+    eu_jaw_f.precision(10);
+    eu_njaw_f.precision(10);
+    trap_f.precision(10);
     for(double t=0.0; t<51.0; t+=dt)
 	{
         eu_jaw = euler(eu_jaw, dt, z1f(t-dt));
@@ -85,8 +91,8 @@ int main()
     eu_jaw_f.open("zad2_eu1.txt");
     std::ofstream dok_f("zad2_dok1.txt");
     std::ofstream err_f("zad2_err1.txt");
-    dok_f.precision(6);
-    err_f.precision(6);
+    dok_f.precision(10);
+    err_f.precision(10);
     for(double t = 0.0; t < 8.0; t+=dt)
     {
         eu_jaw = euler(eu_jaw, dt, z2f(t, eu_jaw));
@@ -224,12 +230,49 @@ int main()
     }
 
     //ZADANIE 4
-    dt = 0.1;
+    dt = 0.01;
     double z4it = 1;
     double u = 1;
-    for(double t = 0.0; t <= 8.0; t+=dt)
+    double epsilon = 1e-6;
+    double z4it2;
+    cout << "Zadanie 4, dt=" << dt << "\n";
+    do
     {
-        z4it = z4iter(t, u, dt, z4it);
-        cout << z4it << "\n";
-    }
+        z4it2 = z4it;
+        z4it = z4iter(dt, u, dt, z4it);
+        cout << std::fixed << z4it << "\n";
+    } while(fabs(z4it2-z4it) >= epsilon);
+//    cout << "Dokladne: " << dokladne_z2f(dt);
+    dt = 0.1;
+    z4it = 1;
+    z4it2 = 999;
+//    cout << "Zadanie 4, dt=" << dt << "\n";
+//    do
+//    {
+//        z4it2 = z4it;
+//        z4it = z4iter(dt, u, dt, z4it);
+//        cout << std::fixed << z4it << "\n";
+//    } while(fabs(z4it2-z4it) >= epsilon);
+    dt = 0.11;
+    z4it = 1;
+    z4it2 = 999;
+    cout << "Zadanie 4, dt=" << dt << "\n";
+//    do
+//    {
+//        z4it2 = z4it;
+//        z4it = z4iter(dt, u, dt, z4it);
+//        cout << std::fixed << z4it << "\n";
+//    } while(fabs(z4it2-z4it) >= epsilon);
+
+    //ZADANIE 5
+    dt = 1.33;
+    u = 1;
+    double z5it = 1;
+    double z5it2;
+    do{
+        z5it2 = z5it;
+        z5it = z5iter(dt, u, dt, z5it);
+        cout << std::fixed << z5it << "\n";
+    } while(fabs(z4it2-z4it) >= epsilon);
+
 }
