@@ -1,0 +1,65 @@
+set term wxt 0
+set title 'Zadanie 1'
+plot 'zad1A_jaw.txt' w l, 'zad1A_njaw.txt' w l, 'zad1A_trap.txt' w l
+
+set term wxt 1 size 1200,800
+set multiplot layout 2,2
+set title 'Zadanie 2, dt=0.01'
+plot 'zad2_eu1.txt' w l, 'zad2_dok1.txt' w l
+set title 'Zadanie 2, dt=0.1'
+plot 'zad2_eu2.txt' w l, 'zad2_dok2.txt' w l
+set title 'Zadanie 2, dt=0.2'
+plot 'zad2_eu3.txt' w l, 'zad2_dok3.txt' w l
+set title 'Zadanie 2, dt=0.215'
+plot 'zad2_eu4.txt' w l, 'zad2_dok4.txt' w l
+unset multiplot
+
+pause 1
+
+set term wxt 2 size 1200,800
+set multiplot layout 2,2
+set title 'Zadanie 2, blad dla dt=0.01'
+plot 'zad2_err1.txt' w l
+set title 'Zadanie 2, blad dla dt=0.1'
+plot 'zad2_err2.txt' w l
+set title 'Zadanie 2, blad dla dt=0.2'
+plot 'zad2_err3.txt' w l
+set title 'Zadanie 2, blad dla dt=0.215'
+plot 'zad2_err4.txt' w l
+unset multiplot
+
+pause 1
+
+set term wxt 3 size 1200,800
+set multiplot layout 3,2
+set title 'Zadanie 3, dt=0.01'
+plot 'zad3_eu1.txt' w l, 'zad3_dok1.txt' w l
+set title 'Zadanie 3, dt=0.1'
+plot 'zad3_eu2.txt' w l, 'zad3_dok2.txt' w l
+set title 'Zadanie 3, dt=0.2'
+plot 'zad3_eu3.txt' w l, 'zad3_dok3.txt' w l
+set title 'Zadanie 3, dt=0.215'
+plot 'zad3_eu4.txt' w l, 'zad3_dok4.txt' w l
+set title 'Zadanie 3, dt=1.33'
+set yrange [-50:400]
+plot 'zad3_eu5.txt' w l, 'zad3_dok5.txt' w l
+unset multiplot
+unset yrange
+
+pause 1
+
+set term wxt 4 size 1200,800
+set multiplot layout 3,2
+set title 'Zadanie 3, blad dla dt=0.01'
+plot 'zad3_err1.txt' w l
+set title 'Zadanie 3, blad dla dt=0.1'
+plot 'zad3_err2.txt' w l
+set title 'Zadanie 3, blad dla dt=0.2'
+plot 'zad3_err3.txt' w l
+set title 'Zadanie 3, blad dla dt=0.215'
+plot 'zad3_err4.txt' w l
+set title 'Zadanie 3, blad dla dt=1.33'
+plot 'zad3_err5.txt' w l
+unset multiplot
+
+pause -1
