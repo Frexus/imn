@@ -88,7 +88,25 @@ double z8filoraz(double u, double du, double t)
 
 double z8iter(double umi, double t, double prevt, double u, double dt, double du)
 {
-    return umi-(u-(dt/2.0)*z2f(t,umi)+z2f(prevt,u))/(1.0-(dt/2.0)*z8filoraz(umi, du, t));
+    return umi-(umi-u-(dt/2.0)*z2f(t,umi)+z2f(prevt,u))/(1.0-(dt/2.0)*z8filoraz(umi, du, t));
+}
+
+double z8u(double t, double u, double dt, double du)
+{
+    double z8it = u, z8it2;
+    double epsilon = 1e-6;
+    double counter;
+    do{
+        counter++;
+        z8it2 = z8it;
+        z8it = z8iter(z8it2, t, t-dt, u, dt, du);
+        cout << std::fixed << z8it << "\n";
+        if(counter == 1000) {
+            cout << "Za duzo iteracji." << "\n";
+            break;
+        }
+    } while(fabs(z8it2-z8it) >= epsilon);
+    return z8it;
 }
 
 
@@ -387,22 +405,27 @@ int main()
     u = 1.5;
     double z8it = u;
     double z8it2;
+    double un_1;
     du = 0.3;
     cout << "Zadanie 8, dt=" << dt << "\n";
     ofstream z8_f("zadanie8.txt");
     for(double t=0; t < 30; t+=dt) {
-        z8it = u;
-        do{
-            counter++;
-            z8it2 = z8it;
-            z8it = z8iter(z8it2, t, t-dt, u, dt, du);
-            cout << std::fixed << z8it << "\n";
-            if(counter == 1000) {
-                cout << "Za duzo iteracji." << "\n";
-                break;
-            }
-        } while(fabs(z8it2-z8it) >= epsilon);
-        z8_f << euler(z8it2, dt, z2f(t-dt, z8it)) << "\n";
+//        z8it = u;
+//        do{
+//            counter++;
+//            z8it2 = z8it;
+//            z8it = z8iter(z8it2, t, t-dt, u, dt, du);
+//            cout << std::fixed << z8it << "\n";
+//            if(counter == 1000) {
+//                cout << "Za duzo iteracji." << "\n";
+//                break;
+//            }
+//        } while(fabs(z8it2-z8it) >= epsilon);
+//        z8_f << euler(z8it2, dt, z2f(t-dt, z8it)) << "\n";
+        un_1 = u;
+        u = z8u(t, un_1, dt, du);
+        z8_f << euler(un_1, dt, z2f(t, u)) << "\n";
+
     }
     cout << "Liczba krokow: " << counter << "\n";
 }
