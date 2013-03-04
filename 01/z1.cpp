@@ -56,6 +56,31 @@ double z5iter(double t, double u, double dt, double umi)
     return umi - ((umi-u-dt*z2f(t, umi))/(1-dt*(-10.0)));
 }
 
+double z6fpoch(double u)
+{
+    return 3.0*u*u-6.0*u+2;
+}
+
+double z6f(double u)
+{
+    return u*(u-1.0)*(u-2.0);
+}
+
+double z6iter(double t, double u, double dt, double umi)
+{
+    return umi - ((umi-u-dt*z6f(umi))/(1-dt*(z6fpoch(umi))));
+}
+
+double z7filoraz(double u, double du)
+{
+    return (z6f(u+du)-z6f(u-du))/(2.0*du);
+}
+
+double z7iter(double t, double u, double dt, double umi, double du)
+{
+    return umi - ((umi-u-dt*z6f(umi))/(1-dt*(z7filoraz(umi, du))));
+}
+
 int main()
 {
     cout.precision(6);
@@ -235,44 +260,114 @@ int main()
     double u = 1;
     double epsilon = 1e-6;
     double z4it2;
+    int counter = 0;
     cout << "Zadanie 4, dt=" << dt << "\n";
     do
     {
+        counter++;
         z4it2 = z4it;
         z4it = z4iter(dt, u, dt, z4it);
         cout << std::fixed << z4it << "\n";
+        if(counter == 1000) {
+            cout << "Za duzo iteracji." << "\n";
+            break;
+        }
     } while(fabs(z4it2-z4it) >= epsilon);
+    cout << "Liczba krokow: " << counter << "\n";
+
 //    cout << "Dokladne: " << dokladne_z2f(dt);
+    counter = 0;
     dt = 0.1;
     z4it = 1;
     z4it2 = 999;
-//    cout << "Zadanie 4, dt=" << dt << "\n";
-//    do
-//    {
-//        z4it2 = z4it;
-//        z4it = z4iter(dt, u, dt, z4it);
-//        cout << std::fixed << z4it << "\n";
-//    } while(fabs(z4it2-z4it) >= epsilon);
+    cout << "Zadanie 4, dt=" << dt << "\n";
+    do
+    {
+        counter++;
+        z4it2 = z4it;
+        z4it = z4iter(dt, u, dt, z4it);
+        cout << std::fixed << z4it << "\n";
+        if(counter == 1000) {
+            cout << "Za duzo iteracji." << "\n";
+            break;
+        }
+    } while(fabs(z4it2-z4it) >= epsilon);
+    cout << "Liczba krokow: " << counter << "\n";
+
+    counter = 0;
     dt = 0.11;
     z4it = 1;
     z4it2 = 999;
     cout << "Zadanie 4, dt=" << dt << "\n";
-//    do
-//    {
-//        z4it2 = z4it;
-//        z4it = z4iter(dt, u, dt, z4it);
-//        cout << std::fixed << z4it << "\n";
-//    } while(fabs(z4it2-z4it) >= epsilon);
+    do
+    {
+        counter++;
+        z4it2 = z4it;
+        z4it = z4iter(dt, u, dt, z4it);
+        cout << std::fixed << z4it << "\n";
+        if(counter == 1000) {
+            cout << "Za duzo iteracji." << "\n";
+            break;
+        }
+    } while(fabs(z4it2-z4it) >= epsilon);
+    cout << "Liczba krokow: " << counter << "\n";
 
     //ZADANIE 5
     dt = 1.33;
     u = 1;
     double z5it = 1;
     double z5it2;
+    counter=0;
+    cout << "Zadanie 5, dt=" << dt << "\n";
     do{
+        counter++;
         z5it2 = z5it;
         z5it = z5iter(dt, u, dt, z5it);
         cout << std::fixed << z5it << "\n";
-    } while(fabs(z4it2-z4it) >= epsilon);
+        if(counter == 1000) {
+            cout << "Za duzo iteracji." << "\n";
+            break;
+        }
+    } while(fabs(z5it2-z5it) >= epsilon);
+    cout << "Liczba krokow: " << counter << "\n";
+
+    //ZADANIE 6
+    counter=0;
+    dt = 1.0;
+    u = 1.5;
+    double z6it = u;
+    double z6it2;
+    cout << "Zadanie 6, dt=" << dt << "\n";
+    do{
+        counter++;
+        z6it2 = z6it;
+        z6it = z6iter(dt, u, dt, z6it);
+        cout << std::fixed << z6it << "\n";
+        if(counter == 1000) {
+            cout << "Za duzo iteracji." << "\n";
+            break;
+        }
+    } while(fabs(z6it2-z6it) >= epsilon);
+    cout << "Liczba krokow: " << counter << "\n";
+
+    //ZADANIE 7
+    counter=0;
+    dt = 1.0;
+    u = 1.5;
+    double z7it = u;
+    double z7it2;
+    double du = 0.4;
+    cout << "Zadanie 7, dt=" << dt << "\n";
+    do{
+        counter++;
+        z7it2 = z6it;
+        z7it = z7iter(dt, u, dt, z7it, du);
+        cout << std::fixed << z7it << "\n";
+        if(counter == 1000) {
+            cout << "Za duzo iteracji." << "\n";
+            break;
+        }
+    } while(fabs(z7it2-z7it) >= epsilon);
+    cout << "Liczba krokow: " << counter << "\n";
 
 }
