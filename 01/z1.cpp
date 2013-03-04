@@ -81,6 +81,17 @@ double z7iter(double t, double u, double dt, double umi, double du)
     return umi - ((umi-u-dt*z6f(umi))/(1-dt*(z7filoraz(umi, du))));
 }
 
+double z8filoraz(double u, double du, double t)
+{
+    return (z2f(t, u+du)-z2f(t, u-du))/(2.0*du);
+}
+
+double z8iter(double umi, double t, double prevt, double u, double dt, double du)
+{
+    return umi-(u-(dt/2.0)*z2f(t,umi)+z2f(prevt,u))/(1.0-(dt/2.0)*z8filoraz(umi, du, t));
+}
+
+
 int main()
 {
     cout.precision(6);
@@ -356,11 +367,11 @@ int main()
     u = 1.5;
     double z7it = u;
     double z7it2;
-    double du = 0.4;
+    double du = 0.3;
     cout << "Zadanie 7, dt=" << dt << "\n";
     do{
         counter++;
-        z7it2 = z6it;
+        z7it2 = z7it;
         z7it = z7iter(dt, u, dt, z7it, du);
         cout << std::fixed << z7it << "\n";
         if(counter == 1000) {
@@ -370,4 +381,28 @@ int main()
     } while(fabs(z7it2-z7it) >= epsilon);
     cout << "Liczba krokow: " << counter << "\n";
 
+    //ZADANIE 8
+    counter=0;
+    dt = 0.2;
+    u = 1.5;
+    double z8it = u;
+    double z8it2;
+    du = 0.3;
+    cout << "Zadanie 8, dt=" << dt << "\n";
+    ofstream z8_f("zadanie8.txt");
+    for(double t=0; t < 30; t+=dt) {
+        z8it = u;
+        do{
+            counter++;
+            z8it2 = z8it;
+            z8it = z8iter(z8it2, t, t-dt, u, dt, du);
+            cout << std::fixed << z8it << "\n";
+            if(counter == 1000) {
+                cout << "Za duzo iteracji." << "\n";
+                break;
+            }
+        } while(fabs(z8it2-z8it) >= epsilon);
+        z8_f << euler(z8it2, dt, z2f(t-dt, z8it)) << "\n";
+    }
+    cout << "Liczba krokow: " << counter << "\n";
 }
