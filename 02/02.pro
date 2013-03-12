@@ -1,2 +1,3 @@
 SOURCES += \
-    z1.cpp
+    z1.cpp \
+    z2.cpp

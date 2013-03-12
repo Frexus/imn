@@ -53,8 +53,8 @@ int main()
         euler_f << t << " " << y_eu << "\n";
         rk2_f << t << " " << y_rk2 << "\n";
         dok_f << t << " " << dok << "\n";
-        euler_err_f << t << " " << y_eu - dok << "\n";
-        rk2_err_f << t << " " << y_rk2 - dok << "\n";
+        euler_err_f << t << " " << dok - y_eu << "\n";
+        rk2_err_f << t << " " << dok - y_rk2 << "\n";
     }
 
     double y1 =1, y2 = 1;
@@ -88,8 +88,8 @@ int main()
         double dok = dokladne(t);
         euler_f << t << " " << y_eu << "\n";
         rk2_f << t << " " << y_rk2 << "\n";
-        euler_err_f << t << " " << y_eu - dok << "\n";
-        rk2_err_f << t << " " << y_rk2 - dok << "\n";
+        euler_err_f << t << " " << -y_eu + dok << "\n";
+        rk2_err_f << t << " " << -y_rk2 + dok << "\n";
     }
 
     euler_f.close();
