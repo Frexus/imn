@@ -195,8 +195,8 @@ int main()
         x1 = x2;
         rk2_uklad(v2, x2, v1, x1, t-dt, dt, func1, func2);
 
-        double Ev = err(v2, v1, 3);
-        double Ex = err(x2, x1, 3);
+        double Ev = err(v2, v1, 5);
+        double Ex = err(x2, x1, 5);
 
         if(Ev < tol)
             v_f << t << " " << v2 << "\n";
