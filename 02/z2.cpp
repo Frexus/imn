@@ -59,28 +59,38 @@ int main()
     double S = 0.75;
     double tol = 0.1;
     double dt = 0.1;
+    double prevt = dt;
+    double prevprevdt = dt;
     cout << "Licze dla tolreancji " << tol << "\n";
     ofstream x_f("z2_x_tol1.txt");
     ofstream v_f("z2_v_tol1.txt");
     ofstream en_f("z2_en_tol1.txt");
-    for(double t = dt; t < 32; t += dt ){
+
+    for(double t = 0, prevt = 0; t < 32; t += dt+dt ){
         v1 = v2;
         x1 = x2;
-        rk2_uklad(v2, x2, v1, x1, t-dt, dt, func1, func2);
+
+        rk2_uklad(v1, x1, v1, x1, t, dt*2.0, func1, func2);
+
+        rk2_uklad(v2, x2, v2, x2, t, dt, func1, func2);
+        rk2_uklad(v2, x2, v2, x2, t + dt, dt, func1, func2);
 
         double Ev = err(v2, v1, 3);
         double Ex = err(x2, x1, 3);
 
-        if(Ev < tol)
-            v_f << t << " " << v2 << "\n";
-        if(Ex < tol)
-            x_f << t << " " << x2 << "\n";
+//        if(Ev < tol)
+//            v_f << t << " " << v2 << "\n";
+//        if(Ex < tol)
+//            x_f << t << " " << x2 << "\n";
         if(Ex < tol && Ev < tol)
+        {
+            x_f << x2 << " " << v2 << "\n";
             en_f << t << " " << 1.0/2.0 * (x2*x2 + v2*v2) << "\n";
+        }
 
         double vtime = new_time(S, tol, Ev, dt, 3);
         double xtime = new_time(S, tol, Ex, dt, 3);
-
+        prevt = t;
         dt = vtime > xtime ? xtime : vtime;
         //cout << dt << endl;
     }
@@ -94,26 +104,32 @@ int main()
     v1 = 0; x1 = 0.5; v2 = 0; x2 = 0.5;
     tol = 0.01;
     cout << "Licze dla tolreancji " << tol << "\n";
-    for(double t = dt; t < 32; t += dt ){
+    for(double t = 0, prevt = 0; t < 32; t += dt+dt ){
         v1 = v2;
         x1 = x2;
-        rk2_uklad(v2, x2, v1, x1, t-dt, dt, func1, func2);
+        rk2_uklad(v1, x1, v1, x1, t, dt*2.0, func1, func2);
 
-        double Ev = err(v2, v1, 3);
-        double Ex = err(x2, x1, 3);
+        rk2_uklad(v2, x2, v2, x2, t, dt, func1, func2);
+        rk2_uklad(v2, x2, v2, x2, t + dt, dt, func1, func2);
 
-        if(Ev < tol)
-            v_f << t << " " << v2 << "\n";
-        if(Ex < tol)
-            x_f << t << " " << x2 << "\n";
+        double Ev = fabs(err(v2, v1, 3));
+        double Ex = fabs(err(x2, x1, 3));
+
+//        if(Ev < tol)
+//            v_f << t << " " << v2 << "\n";
+//        if(Ex < tol)
+//            x_f << t << " " << x2 << "\n";
         if(Ex < tol && Ev < tol)
+        {
+            x_f << x2 << " " << v2 << "\n";
             en_f << t << " " << 1.0/2.0 * (x2*x2 + v2*v2) << "\n";
+        }
 
         double vtime = new_time(S, tol, Ev, dt, 3);
         double xtime = new_time(S, tol, Ex, dt, 3);
-
+        prevt = t;
         dt = vtime > xtime ? xtime : vtime;
-        //cout << dt << endl;
+        cout << dt << " " << Ex << " " << Ev << "\n";
     }
 
     x_f.close();
@@ -126,24 +142,31 @@ int main()
     v1 = 0; x1 = 0.5; v2 = 0; x2 = 0.5;
     tol = 0.001;
     cout << "Licze dla tolreancji " << tol << "\n";
-    for(double t = dt; t < 32; t += dt ){
+    for(double t = 0, prevt = 0; t < 32; t += dt+dt ){
+
         v1 = v2;
         x1 = x2;
-        rk2_uklad(v2, x2, v1, x1, t-dt, dt, func1, func2);
+        rk2_uklad(v1, x1, v1, x1, t, dt*2, func1, func2);
+
+        rk2_uklad(v2, x2, v2, x2, t, dt, func1, func2);
+        rk2_uklad(v2, x2, v2, x2, t + dt, dt, func1, func2);
 
         double Ev = err(v2, v1, 3);
         double Ex = err(x2, x1, 3);
 
-        if(Ev < tol)
-            v_f << t << " " << v2 << "\n";
-        if(Ex < tol)
-            x_f << t << " " << x2 << "\n";
+//        if(Ev < tol)
+//            v_f << t << " " << v2 << "\n";
+//        if(Ex < tol)
+//            x_f << t << " " << x2 << "\n";
         if(Ex < tol && Ev < tol)
+        {
+            x_f << x2 << " " << v2 << "\n";
             en_f << t << " " << 1.0/2.0 * (x2*x2 + v2*v2) << "\n";
+        }
 
         double vtime = new_time(S, tol, Ev, dt, 3);
         double xtime = new_time(S, tol, Ex, dt, 3);
-
+        prevt = t;
         dt = vtime > xtime ? xtime : vtime;
         //cout << dt << endl;
     }
@@ -158,24 +181,31 @@ int main()
     v1 = 0; x1 = 0.5; v2 = 0; x2 = 0.5;
     tol = 0.0001;
     cout << "Licze dla tolreancji " << tol << "\n";
-    for(double t = dt; t < 32; t += dt ){
-        v1 = v2;
-        x1 = x2;
-        rk2_uklad(v2, x2, v1, x1, t-dt, dt, func1, func2);
+    for(double t = 0, prevt = 0; t < 32; t += dt+dt ){
+
+        rk2_uklad(v1, x1, v1, x1, t, dt*2, func1, func2);
+
+        rk2_uklad(v2, x2, v2, x2, t, dt, func1, func2);
+        rk2_uklad(v2, x2, v2, x2, t + dt, dt, func1, func2);
 
         double Ev = err(v2, v1, 3);
         double Ex = err(x2, x1, 3);
 
-        if(Ev < tol)
-            v_f << t << " " << v2 << "\n";
-        if(Ex < tol)
-            x_f << t << " " << x2 << "\n";
+//        if(Ev < tol)
+//            v_f << t << " " << v2 << "\n";
+//        if(Ex < tol)
+//            x_f << t << " " << x2 << "\n";
         if(Ex < tol && Ev < tol)
+        {
+            v1 = v2;
+            x1 = x2;
+            x_f << x2 << " " << v2 << "\n";
             en_f << t << " " << 1.0/2.0 * (x2*x2 + v2*v2) << "\n";
+        }
 
         double vtime = new_time(S, tol, Ev, dt, 3);
         double xtime = new_time(S, tol, Ex, dt, 3);
-
+        prevt = t;
         dt = vtime > xtime ? xtime : vtime;
         //cout << dt << endl;
     }
@@ -190,24 +220,30 @@ int main()
     v1 = 0; x1 = 0.5; v2 = 0; x2 = 0.5;
     tol = 0.00001;
     cout << "Licze dla tolreancji " << tol << "\n";
-    for(double t = dt; t < 32; t += dt ){
+    for(double t = 0, prevt = 0; t < 32; t += dt+dt ){
         v1 = v2;
         x1 = x2;
-        rk2_uklad(v2, x2, v1, x1, t-dt, dt, func1, func2);
+        rk2_uklad(v1, x1, v1, x1, t, dt*2, func1, func2);
 
-        double Ev = err(v2, v1, 5);
-        double Ex = err(x2, x1, 5);
+        rk2_uklad(v2, x2, v2, x2, t, dt, func1, func2);
+        rk2_uklad(v2, x2, v2, x2, t + dt, dt, func1, func2);
 
-        if(Ev < tol)
-            v_f << t << " " << v2 << "\n";
-        if(Ex < tol)
-            x_f << t << " " << x2 << "\n";
+        double Ev = err(v2, v1, 3);
+        double Ex = err(x2, x1, 3);
+
+//        if(Ev < tol)
+//            v_f << t << " " << v2 << "\n";
+//        if(Ex < tol)
+//            x_f << t << " " << x2 << "\n";
         if(Ex < tol && Ev < tol)
+        {
+            x_f << x2 << " " << v2 << "\n";
             en_f << t << " " << 1.0/2.0 * (x2*x2 + v2*v2) << "\n";
+        }
 
         double vtime = new_time(S, tol, Ev, dt, 3);
         double xtime = new_time(S, tol, Ex, dt, 3);
-
+        prevt = t;
         dt = vtime > xtime ? xtime : vtime;
         //cout << dt << endl;
     }
@@ -222,24 +258,30 @@ int main()
     v1 = 0; x1 = 0.5; v2 = 0; x2 = 0.5;
     tol = 0.000001;
     cout << "Licze dla tolreancji " << tol << "\n";
-    for(double t = dt; t < 32; t += dt ){
+    for(double t = 0, prevt = 0; t < 32; t += dt+dt ){
         v1 = v2;
         x1 = x2;
-        rk2_uklad(v2, x2, v1, x1, t-dt, dt, func1, func2);
+        rk2_uklad(v1, x1, v1, x1, t, dt*2, func1, func2);
+
+        rk2_uklad(v2, x2, v2, x2, t, dt, func1, func2);
+        rk2_uklad(v2, x2, v2, x2, t + dt, dt, func1, func2);
 
         double Ev = err(v2, v1, 3);
         double Ex = err(x2, x1, 3);
 
-        if(Ev < tol)
-            v_f << t << " " << v2 << "\n";
-        if(Ex < tol)
-            x_f << t << " " << x2 << "\n";
+//        if(Ev < tol)
+//            v_f << t << " " << v2 << "\n";
+//        if(Ex < tol)
+//            x_f << t << " " << x2 << "\n";
         if(Ex < tol && Ev < tol)
+        {
+            x_f << x2 << " " << v2 << "\n";
             en_f << t << " " << 1.0/2.0 * (x2*x2 + v2*v2) << "\n";
+        }
 
         double vtime = new_time(S, tol, Ev, dt, 3);
         double xtime = new_time(S, tol, Ex, dt, 3);
-
+        prevt = t;
         dt = vtime > xtime ? xtime : vtime;
         //cout << dt << endl;
     }
