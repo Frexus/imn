@@ -79,7 +79,7 @@ void zad3(double y11, double y21, double S, double T, double tol,
 
         f(y11, y21, y11, y21, t, dt*2.0, func1, func2);
 
-        f(y12, y22, y11, y22, t, dt, func1, func2);
+        f(y12, y22, y12, y22, t, dt, func1, func2);
         f(y12, y22, y12, y22, t + dt, dt, func1, func2);
 
         double Ev = err(y11, y12, 5);
