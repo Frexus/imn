@@ -77,10 +77,10 @@ void zad3(double y11, double y21, double S, double T, double tol,
         y12 = y11;
         y22 = y21;
 
-        f(y11, y21, y11, y21, t, dt*2.0, func1, func2);
+        f(y11, y21, y11, y21, t, dt, func1, func2);
 
-        f(y12, y22, y12, y22, t, dt, func1, func2);
-        f(y12, y22, y12, y22, t + dt, dt, func1, func2);
+        f(y12, y22, y12, y22, t, dt/2.0, func1, func2);
+        f(y12, y22, y12, y22, t + dt/2.0, dt/2.0, func1, func2);
 
         double Ev = err(y11, y12, 5);
         double Ex = err(y21, y22, 5);
@@ -89,12 +89,13 @@ void zad3(double y11, double y21, double S, double T, double tol,
         {
             double y1, y2;
             dokladne(y1, y2, t);
-            out << t << " " << dt << " " << y11 << " " << y21 << " " << y1 << " " << y2 << "\n";
+            out << t << " " << dt << " " << y12 << " " << y22 << " " << y1 << " " << y2;
             t+=dt;
         }
 
         double vtime = new_time(S, tol, Ev, dt, 5);
         double xtime = new_time(S, tol, Ex, dt, 5);
+        out << " " << vtime << " " << xtime << " \n";
         dt = vtime > xtime ? xtime : vtime;
         ++krok;
 
@@ -107,4 +108,5 @@ void zad3(double y11, double y21, double S, double T, double tol,
 int main()
 {
     zad3(0, 1, 0.75, 10000, 0.00001, rk4_uklad, "z3.txt");
+    zad3(0, 1, 0.75, 10000, 0.00001, rk2_uklad, "z3_rk2.txt");
 }
