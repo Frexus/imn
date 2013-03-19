@@ -8,19 +8,35 @@
 
 using namespace std;
 
-double euler(double prevY, double t, double dt, double (*f)(double t, double y))
+#define L1 1.0
+#define L2 0.001
+#define KROK_MAX 1e6
+
+double func1(double t, double y1, double y2)
 {
-    return prevY + dt*f(t-dt, prevY);
+    return -L1*y1 + L2*y2+1./2.;
 }
 
-double rk2(double prevY, double t, double dt, double (*f)(double t, double y))
+double func2(double t, double y1, double y2)
 {
-    return prevY + dt * f(t-dt + (dt/2.0), prevY + (1.0*dt*f(t-dt, prevY))/(2.0));
+    return -L2*y2;
 }
 
-double richardson(double y1, double y2, int n)
+//void trapez(double& y1, double& y2, double prevy1, double prevy2, double dt)
+//{
+//    y1 = (prevy1*(1.0 - (L1 * dt)/2.))/(1. + (L1*dt)/2.) + dt/2. * (2*L2*prevy2 + L1)/(1. + (L1*dt)/2.);
+//    y2 = (prevy2 * (1 - (L2*dt)/2.))(1. + (L2*dt)/2.);
+//}
+
+double trapez(double prevy1, double prevy2, double prevdt, double dt, double (*f)(double, double, double))
 {
-    return y1 + (y2 - y1)/(pow(2, n-1) - 1);
+    return prevy + dt/2. * (func(t, prevy1, prevy2) + func())
+}
+
+void dokladne(double& y1, double& y2, double t)
+{
+    y1 = 0.5*((L1+L2)/(L2-L1))*exp(-L1*t)+L2/(L1-L2)*exp(-L2*t)+1./2.;
+    y2 = exp(-L2*t);
 }
 
 double err(double y2, double y1, double n)
@@ -33,271 +49,51 @@ double new_time(double S, double tol, double E, double dt, double n)
     return pow((S*tol)/abs(E), 1.0/n)*dt;
 }
 
-double func1 (double t, double x, double v)
+void zad1_1(double n, double y11, double y21, double S, double T, double tol,
+          void (*f)(double&, double&, double, double, double, double, double (*f1)(double, double, double), double (*f2)(double, double, double)),
+          char* file)
 {
-    return (8.0/32.0) * 3.1415 * v;
-}
+    ofstream out(file);
+    double dt = 0.1;
+    double y12, y22;
+    double prevy1, prevy2;
+    int krok = 0;
+    for(double t = dt; t < T;){
+        prevy1 = y11;
+        prevy2 = y12;
+        y12 = y11;
+        y22 = y21;
 
-double func2(double t, double x, double v)
-{
-    return -(8.0/32.0) * 3.1415 * x;
-}
+        f(y11, y21, y11, y21, t, dt, func1, func2);
 
-void rk2_uklad(double& u1, double& u2, double prevu1, double prevu2, double prevt, double dt, double (*f1)(double t, double uf, double ut), double (*f2)(double t, double uf, double ut))
-{
-    double k11 = f1(prevt, prevu1, prevu2);
-    double k12 = f2(prevt, prevu1, prevu2);
-    double k21 = f1(prevt + dt, prevu1+dt * k11, prevu2 + dt * k12);
-    double k22 = f2(prevt + dt, prevu1+dt * k11, prevu2 + dt * k12);
-    u1 = prevu1 + (dt/2.0)*(k11 + k21);
-    u2 = prevu2 + (dt/2.0)*(k12 + k22);
+        f(y12, y22, y12, y22, t, dt/2.0, func1, func2);
+        f(y12, y22, y12, y22, t + dt/2.0, dt/2.0, func1, func2);
+
+        double Ev = err(y11, y12, 5);
+        double Ex = err(y21, y22, 5);
+
+        if(Ex < tol && Ev < tol)
+        {
+            double y1, y2;
+            dokladne(y1, y2, t);
+            out << t << " " << dt << " " << y12 << " " << y22 << " " << y1 << " " << y2;
+            t+=dt;
+        }
+
+        double vtime = new_time(S, tol, Ev, dt, 5);
+        double xtime = new_time(S, tol, Ex, dt, 5);
+        out << " " << vtime << " " << xtime << " \n";
+        dt = vtime > xtime ? xtime : vtime;
+        ++krok;
+
+        //cout << dt << endl;
+    }
+    cout << krok << endl;
 }
 
 int main()
 {
-    double v1 = 0, x1 = 0.5, v2 = 0, x2 = 0.5;
-    double S = 0.75;
-    double tol = 0.1;
-    double dt = 0.1;
-    double prevt = dt;
-    double prevprevdt = dt;
-    cout << "Licze dla tolreancji " << tol << "\n";
-    ofstream x_f("z2_x_tol1.txt");
-    ofstream en_f("z2_en_tol1.txt");
-    ofstream dt_f("z2_dt_tol1.txt");
-    int krok = 0;
-    for(double t = 0, prevt = 0; t < 32; ){
-        v1 = v2;
-        x1 = x2;
-
-        rk2_uklad(v1, x1, v1, x1, t, dt*2.0, func1, func2);
-
-        rk2_uklad(v2, x2, v2, x2, t, dt, func1, func2);
-        rk2_uklad(v2, x2, v2, x2, t + dt, dt, func1, func2);
-
-        double Ev = err(v2, v1, 3);
-        double Ex = err(x2, x1, 3);
-
-        if(Ex < tol && Ev < tol)
-        {
-            t+=dt;
-            x_f << x2 << " " << v2 << "\n";
-            en_f << t << " " << 1.0/2.0 * (x2*x2 + v2*v2) << "\n";
-        }
-
-        double vtime = new_time(S, tol, Ev, dt, 3);
-        double xtime = new_time(S, tol, Ex, dt, 3);
-        prevt = t;
-        dt = vtime > xtime ? xtime : vtime;
-        dt_f << t << " " << dt << " " << x2*x2 << " " << v2*v2 << "\n";
-
-        //cout << dt << endl;
-    }
-    x_f.close();
-    en_f.close();
-    dt_f.close();
-    dt_f.open("z2_dt_tol01.txt");
-    krok = 0;
-    en_f.open("z2_en_tol01.txt");
-    x_f.open("z2_x_tol01.txt");
-    dt = 0.1;
-    v1 = 0; x1 = 0.5; v2 = 0; x2 = 0.5;
-    tol = 0.01;
-    krok = 0;
-    cout << "Licze dla tolreancji " << tol << "\n";
-    for(double t = 0, prevt = 0; t < 32; ){
-        v1 = v2;
-        x1 = x2;
-        rk2_uklad(v1, x1, v1, x1, t, dt*2.0, func1, func2);
-
-        rk2_uklad(v2, x2, v2, x2, t, dt, func1, func2);
-        rk2_uklad(v2, x2, v2, x2, t + dt, dt, func1, func2);
-
-        double Ev = fabs(err(v2, v1, 3));
-        double Ex = fabs(err(x2, x1, 3));
-
-        if(Ex < tol && Ev < tol)
-        {
-            t+=dt;
-            x_f << x2 << " " << v2 << "\n";
-            en_f << t << " " << 1.0/2.0 * (x2*x2 + v2*v2) << "\n";
-        }
-
-        double vtime = new_time(S, tol, Ev, dt, 3);
-        double xtime = new_time(S, tol, Ex, dt, 3);
-        prevt = t;
-        dt = vtime > xtime ? xtime : vtime;
-        dt_f << t << " " << dt << " " << x2*x2 << " " << v2*v2 << "\n";
-
-    }
-
-    x_f.close();
-    en_f.close();
-    dt_f.close();
-    dt_f.open("z2_dt_tol001.txt");
-    krok = 0;
-    en_f.open("z2_en_tol001.txt");
-    x_f.open("z2_x_tol001.txt");
-    dt = 0.1;
-    v1 = 0; x1 = 0.5; v2 = 0; x2 = 0.5;
-    tol = 0.001;
-    cout << "Licze dla tolreancji " << tol << "\n";
-    for(double t = 0, prevt = 0; t < 32;){
-
-        v1 = v2;
-        x1 = x2;
-        rk2_uklad(v1, x1, v1, x1, t, dt*2, func1, func2);
-
-        rk2_uklad(v2, x2, v2, x2, t, dt, func1, func2);
-        rk2_uklad(v2, x2, v2, x2, t + dt, dt, func1, func2);
-
-        double Ev = err(v2, v1, 3);
-        double Ex = err(x2, x1, 3);
-
-//        if(Ev < tol)
-//            v_f << t << " " << v2 << "\n";
-//        if(Ex < tol)
-//            x_f << t << " " << x2 << "\n";
-        if(Ex < tol && Ev < tol)
-        {
-            t+=dt;
-            x_f << x2 << " " << v2 << "\n";
-            en_f << t << " " << 1.0/2.0 * (x2*x2 + v2*v2) << "\n";
-        }
-
-        double vtime = new_time(S, tol, Ev, dt, 3);
-        double xtime = new_time(S, tol, Ex, dt, 3);
-        prevt = t;
-        dt = vtime > xtime ? xtime : vtime;
-        dt_f << t << " " << dt << " " << x2*x2 << " " << v2*v2 << "\n";
-
-        //cout << dt << endl;
-    }
-
-    x_f.close();
-    en_f.close();
-    dt_f.close();
-    dt_f.open("z2_dt_tol0001.txt");
-    krok = 0;
-    en_f.open("z2_en_tol0001.txt");
-    x_f.open("z2_x_tol0001.txt");
-    dt = 0.1;
-    v1 = 0; x1 = 0.5; v2 = 0; x2 = 0.5;
-    tol = 0.0001;
-    cout << "Licze dla tolreancji " << tol << "\n";
-    for(double t = 0, prevt = 0; t < 32; ){
-        v1 = v2;
-        x1 = x2;
-        rk2_uklad(v1, x1, v1, x1, t, dt*2, func1, func2);
-
-        rk2_uklad(v2, x2, v2, x2, t, dt, func1, func2);
-        rk2_uklad(v2, x2, v2, x2, t + dt, dt, func1, func2);
-
-        double Ev = err(v2, v1, 3);
-        double Ex = err(x2, x1, 3);
-
-//        if(Ev < tol)
-//            v_f << t << " " << v2 << "\n";
-//        if(Ex < tol)
-//            x_f << t << " " << x2 << "\n";
-        if(Ex < tol && Ev < tol)
-        {
-            t+=dt;
-
-            x_f << x2 << " " << v2 << "\n";
-            en_f << t << " " << 1.0/2.0 * (x2*x2 + v2*v2) << "\n";
-        }
-
-        double vtime = new_time(S, tol, Ev, dt, 3);
-        double xtime = new_time(S, tol, Ex, dt, 3);
-        prevt = t;
-        dt = vtime > xtime ? xtime : vtime;
-        dt_f << t << " " << dt << " " << x2*x2 << " " << v2*v2 << "\n";
-
-        //cout << dt << endl;
-    }
-
-    x_f.close();
-    en_f.close();
-    dt_f.close();
-    dt_f.open("z2_dt_tol00001.txt");
-    krok = 0;
-    en_f.open("z2_en_tol00001.txt");
-    x_f.open("z2_x_tol00001.txt");
-    dt = 0.1;
-    v1 = 0; x1 = 0.5; v2 = 0; x2 = 0.5;
-    tol = 0.00001;
-    cout << "Licze dla tolreancji " << tol << "\n";
-    for(double t = 0, prevt = 0; t < 32; ){
-        v1 = v2;
-        x1 = x2;
-        rk2_uklad(v1, x1, v1, x1, t, dt*2, func1, func2);
-
-        rk2_uklad(v2, x2, v2, x2, t, dt, func1, func2);
-        rk2_uklad(v2, x2, v2, x2, t + dt, dt, func1, func2);
-
-        double Ev = err(v2, v1, 3);
-        double Ex = err(x2, x1, 3);
-
-//        if(Ev < tol)
-//            v_f << t << " " << v2 << "\n";
-//        if(Ex < tol)
-//            x_f << t << " " << x2 << "\n";
-        if(Ex < tol && Ev < tol)
-        {
-            t+=dt;
-            x_f << x2 << " " << v2 << "\n";
-            en_f << t << " " << 1.0/2.0 * (x2*x2 + v2*v2) << "\n";
-        }
-
-        double vtime = new_time(S, tol, Ev, dt, 3);
-        double xtime = new_time(S, tol, Ex, dt, 3);
-        prevt = t;
-        dt = vtime > xtime ? xtime : vtime;
-        dt_f << t << " " << dt << " " << x2*x2 << " " << v2*v2 << "\n";
-
-        //cout << dt << endl;
-    }
-
-    x_f.close();
-    en_f.close();
-    dt_f.close();
-    dt_f.open("z2_dt_tol000001.txt");
-    krok = 0;
-    en_f.open("z2_en_tol000001.txt");
-    x_f.open("z2_x_tol000001.txt");
-    dt = 0.1;
-    v1 = 0; x1 = 0.5; v2 = 0; x2 = 0.5;
-    tol = 0.000001;
-    cout << "Licze dla tolreancji " << tol << "\n";
-    for(double t = 0, prevt = 0; t < 32; ){
-        v1 = v2;
-        x1 = x2;
-        rk2_uklad(v1, x1, v1, x1, t, dt*2, func1, func2);
-
-        rk2_uklad(v2, x2, v2, x2, t, dt, func1, func2);
-        rk2_uklad(v2, x2, v2, x2, t + dt, dt, func1, func2);
-
-        double Ev = err(v2, v1, 3);
-        double Ex = err(x2, x1, 3);
-
-//        if(Ev < tol)
-//            v_f << t << " " << v2 << "\n";
-//        if(Ex < tol)
-//            x_f << t << " " << x2 << "\n";
-        if(Ex < tol && Ev < tol)
-        {
-            t+=dt;
-            x_f << x2 << " " << v2 << "\n";
-            en_f << t << " " << 1.0/2.0 * (x2*x2 + v2*v2) << "\n";
-        }
-
-        double vtime = new_time(S, tol, Ev, dt, 3);
-        double xtime = new_time(S, tol, Ex, dt, 3);
-        prevt = t;
-        dt = vtime > xtime ? xtime : vtime;
-        dt_f << t << " " << dt << " " << x2*x2 << " " << v2*v2 << "\n";
-
-        //cout << dt << endl;
-    }
+    zad1_1(5, 0, 1, 0.75, 10000, 0.00001, rk4_uklad, "z1.txt");
+    zad1_1(3, 0, 1, 0.75, 10000, 0.00001, rk2_uklad, "z1_rk2.txt");
+    zad1_2(3, 0, 1, 0.75, 10000, 0.00001, rk2_uklad, "z1_1.txt");
 }
