@@ -79,11 +79,11 @@ void zad1_1(double n, double y11, double y21, double S, double T, double tol,
     int krok = 0;
     for(double t = 0; t < T;){
 
-        f(y11, y21, prevy1, prevy2, t, dt*2.0, func1, func2);
+        f(y11, y21, prevy1, prevy2, t, dt, func1, func2);
 
         double tmpy1, tmpy2;
-        f(tmpy1, tmpy2, prevy1, prevy2, t, dt, func1, func2);
-        f(y12, y22, tmpy1, tmpy2, t + dt, dt, func1, func2);
+        f(tmpy1, tmpy2, prevy1, prevy2, t, dt/2., func1, func2);
+        f(y12, y22, tmpy1, tmpy2, t + dt, dt/2., func1, func2);
 
         double Ev = fabs(err(y12, y11, n));
         double Ex = fabs(err(y22, y21, n));
