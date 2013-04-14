@@ -44,19 +44,35 @@ double f_dokl(double r)
     return exp(-r) * (0.125 * pow(r, 3.) + 0.75 * pow(r, 2.) + 2.25 * r + 3.) - 3.;
 }
 
+<<<<<<< Updated upstream
 void zad5()
+=======
+void zad6()
+>>>>>>> Stashed changes
 {
     double dr = 0.1;
     double df, dg;
     df = -3;
     dg = 0;
+<<<<<<< Updated upstream
     for(double r = 30; r >= 0; r -= dr)
     {
         rk2_uklad(df, dg, df, dg, r, dr, func1, func2);
         cout << r << " " << df << " " << dg << " " << f_dokl(r) << "\n";
+=======
+    ofstream out("z6.txt");
+    for(double r = 30; r >= 0; r -= dr)
+    {
+        rk2_uklad(df, dg, df, dg, r, dr, func1, func2);
+        out << r << " " << df << " " << dg << " " << f_dokl(r) << " " << fabs(f_dokl(r) - df) << "\n";
+>>>>>>> Stashed changes
     }
 }
 int main()
 {
+<<<<<<< Updated upstream
     zad5();
+=======
+    zad6();
+>>>>>>> Stashed changes
 }

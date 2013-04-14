@@ -27,13 +27,20 @@ double calka(double *tbl, const double dr)
     double sum = 0;
     for(i = 1; i < M-1; ++i)
     {
+<<<<<<< Updated upstream
         sum += (1. / 2.) * pow((tbl[i+1] - tbl[i-1])/(2. * dr), 2.) - 4. * M_PI * (i*dr) * n(i/30.) * tbl[i];
     }
     return sum * dr;
+=======
+        sum += (1. / 2.) * pow((tbl[i+1] - tbl[i-1])/(2. * dr), 2.) - 4. * M_PI * (i*dr) * n(i*dr) * tbl[i];
+    }
+    return sum;
+>>>>>>> Stashed changes
 }
 
 void zad2(double dr, const double eps, char* filename)
 {
+<<<<<<< Updated upstream
     double tbl[M] = {0};
     tbl[M-1] = tbl[M-2] = -3;
     ofstream out(filename);
@@ -52,9 +59,29 @@ void zad2(double dr, const double eps, char* filename)
     for(int i = 0; i < M; ++i)
     {
         out << dr * i << " " << tbl[i] << " " << f_dokl(i*dr) << " " << fabs(tbl[i] - f_dokl(i*dr)) << "\n";
+=======
+    double tbl[M];
+    for(int i=0; i < M; ++i) tbl[i] = 0;
+    tbl[M-1] = tbl[M-2] = -3;
+    ofstream out(filename);
+    double prevdiff = 0, diff = 0;
+
+    for(int i = M-2; i > 0; --i)
+    {
+        tbl[i-1] = pfm(tbl[i], tbl[i+1], dr, i*dr);
+    }
+        
+    for(int i = 0; i < M; ++i)
+    {
+        out << dr * i << " " << tbl[i] << " " << f_dokl(i*dr) << " " << f_dokl(i*dr) - tbl[i] << "\n";
+>>>>>>> Stashed changes
     }
 }    
 int main()
 {
+<<<<<<< Updated upstream
     zad2(0.1, 10e-8, "z2e8.txt");
+=======
+    zad2(0.1, 10e-13, "z2e13.txt");
+>>>>>>> Stashed changes
 }

@@ -21,17 +21,26 @@ double Sm(double r)
     return -4. * M_PI * n(r) * r;
 }
 
+<<<<<<< Updated upstream
 
 
+=======
+>>>>>>> Stashed changes
 void zad5(double dr, double f1,  const double eps, char* filename)
 {
     double tbl[M] = {0};
     tbl[0] = 0;
     tbl[1] = f1;
     ofstream out(filename);
+<<<<<<< Updated upstream
     for(int i=2; i < M; ++i)
     {
         tbl[i] = ( (dr * dr) / (12.) ) * (Sm(i*dr + dr) + 10. * Sm(i * dr) + Sm(i * dr - dr)) + 2 * tbl[i-1] - tbl[i-2];
+=======
+    for(int i=1; i < M-1; ++i)
+    {
+        tbl[i+1] = ( (dr * dr) / (12.) ) * (Sm(i*dr + dr) + 10. * Sm(i * dr) + Sm(i * dr - dr)) + 2 * tbl[i] - tbl[i-1];
+>>>>>>> Stashed changes
     }
     for(int i = 0; i < M; ++i)
     {
@@ -45,9 +54,15 @@ void zad5_2(double dr, double f1,  const double eps, char* filename)
     tbl[0] = 0;
     tbl[1] = f1;
     ofstream out(filename);
+<<<<<<< Updated upstream
     for(int i=2; i < M_2; ++i)
     {
         tbl[i] = ( (dr * dr) / (12.) ) * (Sm(i*dr + dr) + 10. * Sm(i * dr) + Sm(i * dr - dr)) + 2 * tbl[i-1] - tbl[i-2];
+=======
+    for(int i=1; i < M_2-1; ++i)
+    {
+        tbl[i+1] = ( (dr * dr) / (12.) ) * (Sm(i*dr + dr) + 10. * Sm(i * dr) + Sm(i * dr - dr)) + 2 * tbl[i] - tbl[i-1];
+>>>>>>> Stashed changes
     }
     for(int i = 0; i < M_2; ++i)
     {
@@ -59,6 +74,10 @@ int main()
 {
     zad5(0.1, f_dokl(0.1), 10e-13, "z5_1.txt");
     zad5_2(0.01, f_dokl(0.01), 10e-13, "z5_2.txt");
+<<<<<<< Updated upstream
     zad5(0.1, -0.0749981, 10e-13, "z5_3.txt");
+=======
+    zad5(0.1, -0.075, 10e-13, "z5_3.txt");
+>>>>>>> Stashed changes
 
 }

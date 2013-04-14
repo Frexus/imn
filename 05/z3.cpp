@@ -27,9 +27,15 @@ double calka(double *tbl, const double dr)
     double sum = 0;
     for(i = 1; i < M-1; ++i)
     {
+<<<<<<< Updated upstream
         sum += (1. / 2.) * pow((tbl[i+1] - tbl[i-1])/(2. * dr), 2.) - 4. * M_PI * (i*dr) * n(i/30.) * tbl[i];
     }
     return sum * dr;
+=======
+        sum += (1. / 2.) * pow((tbl[i+1] - tbl[i-1])/(2. * dr), 2.) - 4. * M_PI * (i*dr) * n(i*dr) * tbl[i];
+    }
+    return sum ;
+>>>>>>> Stashed changes
 }
 
 void zad3(double dr, double f1, const double eps, char* filename)
@@ -38,6 +44,7 @@ void zad3(double dr, double f1, const double eps, char* filename)
     tbl[0] = 0;
     tbl[1] = f1;
     ofstream out(filename);
+<<<<<<< Updated upstream
     double prevdiff = 0, diff = 0;
     do {
         prevdiff = diff;
@@ -50,6 +57,14 @@ void zad3(double dr, double f1, const double eps, char* filename)
         diff = calka(tbl, dr);
     }
     while(fabs(prevdiff - diff) > eps);
+=======
+
+        for(int i = 1; i < M-1; ++i)
+        {
+            tbl[i+1] = nfm(tbl[i], tbl[i-1], dr, i*dr);
+        }
+        
+>>>>>>> Stashed changes
     for(int i = 0; i < M; ++i)
     {
         out << dr * i << " " << tbl[i] << " " << f_dokl(i*dr) << " " << fabs(tbl[i] - f_dokl(i*dr)) << "\n";
@@ -63,6 +78,7 @@ void zad3_2(double dr, double f1, const double eps, char* filename)
     tbl[1] = f1;
     ofstream out(filename);
     double prevdiff = 0, diff = 0;
+<<<<<<< Updated upstream
     do {
         prevdiff = diff;
         
@@ -77,11 +93,26 @@ void zad3_2(double dr, double f1, const double eps, char* filename)
     for(int i = 0; i < M_2; ++i)
     {
         out << dr * i << " " << tbl[i] << " " << f_dokl(i*dr) << " " << fabs(tbl[i] - f_dokl(i*dr)) << "\n";
+=======
+        
+        for(int i = 1; i < M_2-1; ++i)
+        {
+            tbl[i+1] = nfm(tbl[i], tbl[i-1], dr, i*dr);
+        }
+        
+    for(int i = 0; i < M_2; ++i)
+    {
+        out << dr * i << " " << tbl[i] << " " << f_dokl(i*dr) << " " << f_dokl(i*dr)- tbl[i] << "\n";
+>>>>>>> Stashed changes
     }
 }
 int main()
 {
     zad3(0.1, f_dokl(0.1), 10e-13, "z3_1.txt");
     zad3_2(0.01, f_dokl(0.01), 10e-13, "z3_2.txt");
+<<<<<<< Updated upstream
     zad3(0.1, -0.0749981, 10e-13, "z3_3.txt");
+=======
+    zad3(0.1, -0.075, 10e-13, "z3_3.txt");
+>>>>>>> Stashed changes
 }
