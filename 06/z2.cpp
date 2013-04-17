@@ -103,11 +103,9 @@ void zad2(bool v, char* prefix)
 			theta[i] = M_PI/4.0 - M_PI/2.0 * ds * (double)i;
 		}
 	}
-	stringstream ss;
-	ss << prefix << "_it" << it << ".txt";
-	string str;
-	ss >> str;
-	f.open(str.c_str(), fstream::out);
+    char* file = new char[20];
+    sprintf(file, "%s_it%d.txt", prefix, it);
+    f.open(file, fstream::out);
 		
 	for(int i=0; i < 101; ++i)
 	{
@@ -127,10 +125,8 @@ void zad2(bool v, char* prefix)
 			theta[i] += F_vec[i][1];
 		}
 		
-		ss << prefix << "_it" << it << ".txt";
-		string str;
-		ss >> str;
-		f.open(str.c_str(), fstream::out);
+        sprintf(file, "%s_it%d.txt", prefix, it);
+        f.open(file, fstream::out);
 		
 		for(int i=0; i < 101; ++i)
 		{
