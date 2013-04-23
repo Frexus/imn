@@ -64,7 +64,7 @@ int main()
 	f.open("z2.txt", ofstream::out);
 	for(int j = 1; j < N-1; ++j)
 	{
-		double rho = -(fi_tab[j-1][60] - 2. * fi_tab[j][60] + fi_tab[j+1][60]);
+		double rho = -(fi_tab[j-1][60] - 2. * fi_tab[j][60] + fi_tab[j+1][60] + fi_tab[j][59] - 2. * fi_tab[j][60] + fi_tab[j][61]);
 		f << j-60 << " " << rho << " " << ro(0, j-60) << "\n";
 	}
 }
