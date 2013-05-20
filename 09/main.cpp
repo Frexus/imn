@@ -77,6 +77,7 @@ void zad1()
 		}
 		map << "\n";
 	}
+
 }
 
 void zad2()
@@ -89,7 +90,7 @@ void zad2()
 	{
 		for( int j = 0; j < Y; j++)
 		{
-			if((i >= 0 && i < 20 && j == 20) || ((i == 79 || j == 119) && j < 120 && j >= 79))
+			if((i >= 79 && i < 120 && j == 20) || ((i == 79 || i == 119) && (j >= 0 && j <20)))
 			{
 				phi[i][j] = phi[0][0];
 			}
@@ -167,6 +168,29 @@ void zad2()
 		}
 		map << "\n";
 	}
+
+            ofstream cisnienie("z3.dat");
+    double pe[X][Y];
+    
+ 		for( int i = 1; i < X - 1; i++ )
+		{
+			for( int j = 1; j < Y - 1; j++ )
+			{
+				/*if(j <= 20 && i >= 79 && i <= 119)
+				{
+                    pe[i][j]=0;
+					continue;
+				}
+				else */
+                if( 79 || i > 119 || j > 20)
+				{
+                    pe[i][j] = 10. + 1. - pow((phi[i+1][j] - phi[i-1][j])/2.,2) - pow((phi[i][j+1] - phi[i][j-1])/2.,2); 
+				}
+                cisnienie << i << " " << j << " " << pe[i][j] << '\n';
+			}
+            cisnienie << '\n';
+		}
+
 }
 
 int main()
