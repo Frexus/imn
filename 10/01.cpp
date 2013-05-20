@@ -51,27 +51,34 @@ void zad1()
 	}
 	
 	int it = 0;
-	double diff = 100;
+	double diff_eta = 100;
+	double prevdiff_eta, prevdiff_phi;
+	double diff_phi = 100;
 	do 
 	{
+		double preveta = eta[50][0];
+		double prevphi = phi[50][0];
+		cout << eta[50][0] << "\n";
 		for(int i = XMIN + 1; i < XMAX; ++i)
 		{
 			for(int j = YMIN + 1; j < YMAX; ++j)
 			{
-				
-				eta[i][j] = (eta[i+1][j] + eta[i-1][j] + eta[i][j-1] + eta[i][j+1]) / 4. - (1./16.) *
-							((phi[i][j+1] - phi[i][j-1]) * (eta[i+1][j] - eta[i-1][j]) -
-							(phi[i+1][j] - phi[i-1][j]) * (eta[i][j+1] - eta[i][j-1]));
 				phi[i][j] = (phi[i+1][j] + phi[i-1][j] + phi[i][j-1] + phi[i][j+1] - eta[i][j] * DX * DX) / 4.;
+				eta[i][j] = (eta[i+1][j] + eta[i-1][j] + eta[i][j-1] + eta[i][j+1]) / 4. - (1./16.) *
+							(
+							(phi[i][j+1] - phi[i][j-1]) * (eta[i+1][j] - eta[i-1][j]) -
+							(phi[i+1][j] - phi[i-1][j]) * (eta[i][j+1] - eta[i][j-1])
+							);
 			}
 		}
 		++it;
-		if(it > 100)
+		if(it > 200)
 		{
-			diff = fabs(eta[50][0] - phi[50][0]);
+			diff_eta = fabs(preveta - eta[50][0]);
+			diff_phi = fabs(prevphi - phi[50][0]);
 		}
 	}
-	while(diff > EPSILON);
+	while(diff_eta > EPSILON || diff_phi > EPSILON);
 	
 	ofstream e("z1e.dat");
 	ofstream p("z1p.dat");
@@ -147,9 +154,15 @@ void zad2()
 		phi[XMIN][i] = (Q / (2. * MI)) * (pow(i * DX, 3) / 3. - (pow(i * DX, 2) / 2.) * (YMIN * DX + YMAX * DX) + YMIN * DX * YMAX * DX * i * DX);
 		phi[XMAX][i] = (Q / (2. * MI)) * (pow(i * DX, 3) / 3. - (pow(i * DX, 2) / 2.) * (YMIN * DX + YMAX * DX) + YMIN * DX * YMAX * DX * i * DX);
 	}
-	
+	int it = 0;
+	double diff_eta = 100;
+	double prevdiff_eta = 0, prevdiff_phi = 0;
+	double diff_phi = 100;
 	do
 	{
+		double preveta = eta[50][0];
+		double prevphi = phi[50][0];
+		
 		for(int i = XMIN; i <= XMAX; ++i)
 		{
 			for(int j = YMIN; j <= YMAX; ++j)
@@ -161,7 +174,7 @@ void zad2()
 				else if(j == JD)
 					eta[i][j] = (2. * (phi[i][JD+1] - phi[i][JD])) / (DX * DX);
 				else if(j == JG)
-					eta[i][j] = (2. * (phi[i][JG-1] - phi[i][Jg])) / (DX * DX);
+					eta[i][j] = (2. * (phi[i][JG-1] - phi[i][JG])) / (DX * DX);
 				else if(j != 39 && j != -39 && j != JD+1 && j != JG-1)
 				{
 					if(i == -ID)
@@ -173,13 +186,60 @@ void zad2()
 					if(i == IG)
 						eta[i][j] = (2. * (phi[IG+1][j] - phi[IG][j])) / (DX * DX);
 				}
-				
 			}
 		}
+		eta[-ID][JD] = ((2. * (phi[-ID-1][JD] - phi[-ID][JD])) / (DX * DX) + (2. * (phi[-ID][JD+1] - phi[-ID][JD])) / (DX * DX)) / 2.;
+		eta[ID][JD] = ((2. * (phi[ID+1][JD] - phi[ID][JD])) / (DX * DX) + (2. * (phi[ID][JD+1] - phi[ID][JD])) / (DX * DX)) / 2.;
+		eta[-IG][JG] = ((2. * (phi[-IG-1][JG] - phi[-IG][JG])) / (DX * DX) + (2. * (phi[-IG][JG+1] - phi[-IG][JG])) / (DX * DX)) / 2.;
+		eta[IG][JG] = ((2. * (phi[IG+1][JG] - phi[IG][JG])) / (DX * DX) + (2. * (phi[IG][JG+1] - phi[IG][JG])) / (DX * DX)) / 2.;
+
+		for(int i = XMIN + 1; i < XMAX; ++i)
+		{
+			for(int j = YMIN + 1; j < YMAX; ++j)
+			{
+				if(j <= JG && i <= -IG && i >= IG && j >= JD && i <= -ID && i >= ID)
+				{ 
+					eta[i][j] = (eta[i+1][j] + eta[i-1][j] + eta[i][j-1] + eta[i][j+1]) / 4. - (1./16.) *
+								((phi[i][j+1] - phi[i][j-1]) * (eta[i+1][j] - eta[i-1][j]) -
+								(phi[i+1][j] - phi[i-1][j]) * (eta[i][j+1] - eta[i][j-1]));
+					phi[i][j] = (phi[i+1][j] + phi[i-1][j] + phi[i][j-1] + phi[i][j+1] - eta[i][j] * DX * DX) / 4.;
+				}
+				else
+				{
+					eta[i][j] = 0;
+				}
+			}
+		}
+		++it;
+		if(it > 100)
+		{
+			prevdiff_eta = diff_eta;
+			prevdiff_phi = diff_phi;
+			diff_eta = fabs(preveta - eta[50][0]);
+			diff_phi = fabs(prevphi - phi[50][0]);
+		}
 	}
+	while(diff_eta > EPSILON || diff_phi > EPSILON);
+	
+	ofstream p("z2p1.dat");
+	
+	for(int i = YMIN ; i <= YMAX; ++i)
+	{
+		for(int j = XMIN ; j <= XMAX; ++j)
+		{
+			p << phi[i][j] << " ";
+		}
+		p << "\n";
+	}
+	
 }
 
 int main()
 {
+	#ifdef Z1
 	zad1();
+	#endif
+	#ifdef Z2
+	zad2();
+	#endif
 }
