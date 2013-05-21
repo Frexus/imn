@@ -1,7 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include "nrutil.c"
+extern "C" {
+	#include "nrutil.c"
+	}
 
 using namespace std;
 
@@ -26,6 +28,8 @@ void zad1()
 	double** eta = dmatrix(XMIN, XMAX, YMIN, YMAX);
 	double** phi = dmatrix(XMIN, XMAX, YMIN, YMAX);
 	
+	double y1 = -0.4, y2 = 0.4;
+	
 	for(int i = XMIN; i <= XMAX; ++i)
 	{
 		for(int j = YMIN; j <= YMAX; ++j)
@@ -36,39 +40,54 @@ void zad1()
 	
 	for(int i = XMIN; i <= XMAX; ++i)
 	{
-		eta[i][YMIN] = (Q / (2. * MI)) * (2. * YMIN * DX - YMIN * DX - YMAX * DX);
-		eta[i][YMAX] = (Q / (2. * MI)) * (2. * YMAX * DX - YMIN * DX - YMAX * DX);
-		phi[i][YMIN] = (Q / (2. * MI)) * (pow(YMIN * DX, 3) / 3. - (pow(YMIN * DX, 2) / 2.) * (YMIN * DX + YMAX * DX) + YMIN * DX * YMAX * DX * YMIN * DX);
-		phi[i][YMAX] = (Q / (2. * MI)) * (pow(YMAX * DX, 3) / 3. - (pow(YMAX * DX, 2) / 2.) * (YMIN * DX + YMAX * DX) + YMIN * DX * YMAX * DX * YMAX * DX);
+		eta[i][YMIN] = (Q / (2. * MI)) * (2. * YMIN * DX - y1 - y2);
+		eta[i][YMAX] = (Q / (2. * MI)) * (2. * YMAX * DX - y1 - y2);
+		phi[i][YMIN] = (Q / (2. * MI)) * (pow(YMIN * DX, 3.) / 3. - (pow(YMIN * DX, 2) / 2.) * (y1 + y2) + y1 * y2 * YMIN * DX);
+		phi[i][YMAX] = (Q / (2. * MI)) * (pow(YMAX * DX, 3.) / 3. - (pow(YMAX * DX, 2) / 2.) * (y1 + y2) + y1 * y2 * YMAX * DX);
 	}
 
 	for(int i = YMIN; i <= YMAX; ++i)
 	{
-		eta[XMIN][i] = (Q / (2. * MI)) * (2. * i * DX - YMIN * DX - YMAX * DX);
-		eta[XMAX][i] = (Q / (2. * MI)) * (2. * i * DX - YMIN * DX - YMAX * DX);
-		phi[XMIN][i] = (Q / (2. * MI)) * (pow(i * DX, 3) / 3. - (pow(i * DX, 2) / 2.) * (YMIN * DX + YMAX * DX) + YMIN * DX * YMAX * DX * i * DX);
-		phi[XMAX][i] = (Q / (2. * MI)) * (pow(i * DX, 3) / 3. - (pow(i * DX, 2) / 2.) * (YMIN * DX + YMAX * DX) + YMIN * DX * YMAX * DX * i * DX);
+		eta[XMIN][i] = (Q / (2. * MI)) * (2. * i * DX - y1 - y2);
+		eta[XMAX][i] = (Q / (2. * MI)) * (2. * i * DX - y1 - y2);
+		phi[XMIN][i] = (Q / (2. * MI)) * (pow(i * DX, 3.) / 3. - (pow(i * DX, 2.) / 2.) * (y1 + y2) + y1 * y2 * i * DX);
+		phi[XMAX][i] = (Q / (2. * MI)) * (pow(i * DX, 3.) / 3. - (pow(i * DX, 2.) / 2.) * (y1 + y2) + y1 * y2 * i * DX);
 	}
+	
+	ofstream test1("inite.dat");
+	ofstream test2("initp.dat");
 	
 	int it = 0;
 	double diff_eta = 100;
-	double prevdiff_eta, prevdiff_phi;
 	double diff_phi = 100;
+	
+	for(int i = XMIN; i <= XMAX; ++i)
+	{
+		for(int j = YMIN; j <= YMAX; ++j)
+		{
+				
+			test1 << eta[i][j] << "\t";
+			test2 << phi[i][j] << "\t";
+		}
+		test1 << "\n";
+		test2 << "\n";
+	}
+	
 	do 
 	{
 		double preveta = eta[50][0];
 		double prevphi = phi[50][0];
-		cout << eta[50][0] << "\n";
+		//cout << eta[50][0] << "\n";
 		for(int i = XMIN + 1; i < XMAX; ++i)
 		{
 			for(int j = YMIN + 1; j < YMAX; ++j)
 			{
-				phi[i][j] = (phi[i+1][j] + phi[i-1][j] + phi[i][j-1] + phi[i][j+1] - eta[i][j] * DX * DX) / 4.;
-				eta[i][j] = (eta[i+1][j] + eta[i-1][j] + eta[i][j-1] + eta[i][j+1]) / 4. - (1./16.) *
+				eta[i][j] = ((eta[i+1][j] + eta[i-1][j] + eta[i][j-1] + eta[i][j+1]) / 4.) -
 							(
-							(phi[i][j+1] - phi[i][j-1]) * (eta[i+1][j] - eta[i-1][j]) -
-							(phi[i+1][j] - phi[i-1][j]) * (eta[i][j+1] - eta[i][j-1])
-							);
+							((phi[i][j+1] - phi[i][j-1]) * (eta[i+1][j] - eta[i-1][j])) -
+							((phi[i+1][j] - phi[i-1][j]) * (eta[i][j+1] - eta[i][j-1]))
+							) / 16.;
+				phi[i][j] = (phi[i+1][j] + phi[i-1][j] + phi[i][j-1] + phi[i][j+1] - eta[i][j] * DX * DX) / 4.;
 			}
 		}
 		++it;
@@ -79,7 +98,7 @@ void zad1()
 		}
 	}
 	while(diff_eta > EPSILON || diff_phi > EPSILON);
-	
+	cout << "it: " << it << endl;
 	ofstream e("z1e.dat");
 	ofstream p("z1p.dat");
 	ofstream u("z1u.dat");
@@ -88,15 +107,15 @@ void zad1()
 	
 	for(int i = YMIN; i <= YMAX; ++i)
 	{
-		e << i << "\t" << eta[0][i] << "\t" << eta[50][i] << "\n";
-		p << i << "\t" << phi[0][i] << "\t" << phi[50][i] << "\n";
-		u << i << "\t" << (Q / (2 * MI)) * (i - YMIN) * (i - YMAX) << (phi[0][i > YMIN ? i - 1 : i] - phi[0][i < YMAX ? i + 1 : i]) / DX <<"\n";
+		e << i << "\t" << eta[0][i] << "\t" << eta[70][i] << "\n";
+		p << i << "\t" << phi[0][i] << "\t" << phi[70][i] << "\n";
+		u << i << "\t" << (Q / (2. * MI)) * (i*DX - y1) * (i*DX - y2) << " " << (phi[0][i > YMIN ? i - 1 : i] - phi[0][i < YMAX ? i + 1 : i]) / (2. * DX) <<"\n";
 	}
 
 	
-	for(int i = XMIN + 1; i < XMAX; ++i)
+	for(int i = XMIN; i <= XMAX; ++i)
 	{
-		for(int j = YMIN + 1; j < YMAX; ++j)
+		for(int j = YMIN; j <= YMAX; ++j)
 		{
 				
 			eta[i][j] = (Q / (2. * MI)) * (2. * j * DX - YMIN * DX - YMAX * DX);
@@ -106,8 +125,8 @@ void zad1()
 	
 	for(int i = YMIN; i <= YMAX; ++i)
 	{
-		e_a << i << "\t" << eta[0][i] << "\t" << eta[50][i] << "\n";
-		p_a << i << "\t" << phi[0][i] << "\t" << phi[50][i] << "\n";
+		e_a << i << "\t" << eta[0][i] << "\t" << eta[70][i] << "\n";
+		p_a << i << "\t" << phi[0][i] << "\t" << phi[70][i] << "\n";
 	}
 	
 	free_dmatrix(eta, XMIN, XMAX, YMIN, YMAX);
@@ -160,8 +179,8 @@ void zad2()
 	double diff_phi = 100;
 	do
 	{
-		double preveta = eta[50][0];
-		double prevphi = phi[50][0];
+		double preveta = eta[100][30];
+		double prevphi = phi[100][30];
 		
 		for(int i = XMIN; i <= XMAX; ++i)
 		{
