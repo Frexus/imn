@@ -1,0 +1,20 @@
+set term pngcairo enhanced size 800,600
+set out 'z1calka.png'
+set logscale x
+plot 'z1a.dat' w lp
+set out 'z2calka.png'
+plot 'z2a.dat' w lp
+unset logscale x
+set pm3d map
+set out 'z3.png'
+splot 'z3.dat' w pm3d
+
+set out 'z1cntr.png'
+set contour both
+set cntrparam levels 80
+unset key
+unset surface
+splot 'z1map.dat'
+
+set out 'z2cntr.png'
+splot 'z2map.dat'
